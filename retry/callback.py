@@ -26,15 +26,15 @@ class CallbackFactory():
             func_args = inspect.getfullargspec(func).args
             self.kwargs.update(
                 {
-                    func_args[i]: a 
+                    func_args[i]: a
                     for i, a in enumerate(args)
                 }
             )
-    
+
     def __call__(self, **override_kwargs):
         """
         Call the wrapped function with provided keyword arguments.
-        If no arguments are provided during calling, 
+        If no arguments are provided during calling,
         then the stored ones (during instance creation) are used.
 
         Returns:
@@ -54,7 +54,8 @@ def callback_factory(func: Callable, *args, **kwargs):
         **kwargs: Keyword arguments to be passed to the function.
 
     Returns:
-        A wrapped function that calls the provided callable function with the specified arguments.
+        A wrapped function that calls the provided
+        callable function with the specified arguments.
 
     Raises:
         TypeError: If `func` is not a callable object.
@@ -66,7 +67,7 @@ def callback_factory(func: Callable, *args, **kwargs):
         func_args = inspect.getfullargspec(func).args
         kwargs.update(
             {
-                func_args[i]: a 
+                func_args[i]: a
                 for i, a in enumerate(args)
             }
         )
