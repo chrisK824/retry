@@ -3,7 +3,7 @@ from typing import Callable
 import inspect
 
 
-class CallbackFactory():
+class CallbackFactory:
     def __init__(self, func: Callable, *args, **kwargs):
         """
         Initialize the CallbackFactory.
@@ -24,12 +24,7 @@ class CallbackFactory():
 
         if len(args) > 0:
             func_args = inspect.getfullargspec(func).args
-            self.kwargs.update(
-                {
-                    func_args[i]: a
-                    for i, a in enumerate(args)
-                }
-            )
+            self.kwargs.update({func_args[i]: a for i, a in enumerate(args)})
 
     def __call__(self, **override_kwargs):
         """
@@ -65,15 +60,11 @@ def callback_factory(func: Callable, *args, **kwargs):
 
     if len(args) > 0:
         func_args = inspect.getfullargspec(func).args
-        kwargs.update(
-            {
-                func_args[i]: a
-                for i, a in enumerate(args)
-            }
-        )
+        kwargs.update({func_args[i]: a for i, a in enumerate(args)})
 
     @wraps(func)
     def wrapped_func(**override_kwargs):
         runtime_kwargs = {**kwargs, **override_kwargs}
         return func(**runtime_kwargs)
+
     return wrapped_func

@@ -7,9 +7,9 @@ class BackOff(ABC):
     """
     Base class for implementing backoff strategies.
     """
-    def __init__(self,
-                 initial_delay: float,
-                 jitter: Optional[Tuple[float, float]] = None):
+    def __init__(
+        self, initial_delay: float, jitter: Optional[Tuple[float, float]] = None
+    ):
         """
         Initialize BackOff object.
 
@@ -19,11 +19,51 @@ class BackOff(ABC):
             jitter (Optional[Tuple[float, float]]): Tuple specifying
                 the range for jitter (random delay on top of
                 the calculated delay), applying after the first round.
+                If provided, it should be a tuple of two floats in sorted order.
+                Defaults to None.
+        Raises:
+            TypeError: If the `jitter` is provided and not a tuple of two floats,
+                or if the values are not of type float.
+            ValueError: If the `jitter` values are not in sorted order.
         """
         self._base_delay = initial_delay
         self._delay = initial_delay
-        self._jitter = jitter
+        self._jitter = self._validate_jitter(jitter)
         self._round = 0
+
+    def _validate_jitter(self, jitter: Optional[Tuple[float, float]]) -> Optional[Tuple[float, float]]:
+        """
+        Validate the jitter values.
+
+        Args:
+            jitter (Optional[Tuple[float, float]]): Tuple specifying
+                the range for jitter (random delay on top of
+                the calculated delay), applying after the first round.
+
+        Returns:
+            Optional[Tuple[float, float]]: The validated jitter values.
+
+        Raises:
+            TypeError: If the `jitter` is not a tuple of two floats,
+                or if the values are not of type float.
+            ValueError: If the `jitter` values are not in sorted order.
+        """
+        if jitter is None:
+            return None
+
+        if not isinstance(jitter, tuple) or len(jitter) != 2:
+            raise TypeError("Jitter must be a tuple of two float values.")
+
+        min_val, max_val = jitter
+        if not (isinstance(min_val, (int, float)) and isinstance(max_val, (int, float))):
+            raise TypeError("Jitter values must be of type float.")
+
+        if min_val > max_val:
+            raise ValueError(
+                "Jitter values must be in sorted order as they represent minimum and maximum values"
+                )
+
+        return min_val, max_val
 
     @abstractmethod
     def _calculate_next_delay(self):
@@ -63,10 +103,12 @@ class LinearBackOff(BackOff):
     """
     Linear backoff strategy.
     """
-    def __init__(self,
-                 initial_delay: float,
-                 step: float,
-                 jitter: Optional[Tuple[float, float]] = None):
+    def __init__(
+        self,
+        initial_delay: float,
+        step: float,
+        jitter: Optional[Tuple[float, float]] = None,
+    ):
         """
         Initialize LinearBackOff object.
 
@@ -95,11 +137,7 @@ class RandomUniformBackOff(BackOff):
     """
     Random uniform backoff strategy.
     """
-
-    def __init__(self,
-                 initial_delay: float,
-                 min_delay: float,
-                 max_delay: float):
+    def __init__(self, initial_delay: float, min_delay: float, max_delay: float):
         """
         Initialize RandomUniformBackOff object.
 
@@ -133,7 +171,7 @@ class ExponentialBackOff(BackOff):
         """
         Calculate the next round's delay for linear backoff strategy.
         """
-        self._delay = self._base_delay * 2 ** self._round
+        self._delay = self._base_delay * 2**self._round
         if self._jitter and self._round > 0:
             self._delay += random.uniform(self._jitter[0], self._jitter[1])
         self._round += 1

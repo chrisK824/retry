@@ -7,7 +7,7 @@ from _logging import _init_logger, _log_retry
 from _exceptions import (
     MaxRetriesException,
     RetriesTimeoutException,
-    RetriesDeadlineException
+    RetriesDeadlineException,
 )
 from backoff import FixedBackOff
 
@@ -15,17 +15,17 @@ retry_logger = _init_logger()
 
 
 def retry(
-        exceptions: tuple = (Exception,),
-        max_retries: Union[int, None] = None,
-        backoff=FixedBackOff(initial_delay=0),
-        timeout: Union[float, None] = None,
-        deadline: Union[float, None] = None,
-        logger: logging.Logger = retry_logger,
-        log_retry_traceback: bool = False,
-        failure_callback: Callable = None,
-        retry_callback: Callable = None,
-        successful_retry_callback: Callable = None):
-
+    exceptions: tuple = (Exception,),
+    max_retries: Union[int, None] = None,
+    backoff=FixedBackOff(initial_delay=0),
+    timeout: Union[float, None] = None,
+    deadline: Union[float, None] = None,
+    logger: logging.Logger = retry_logger,
+    log_retry_traceback: bool = False,
+    failure_callback: Callable = None,
+    retry_callback: Callable = None,
+    successful_retry_callback: Callable = None,
+):
     def wrapped_func(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -42,7 +42,7 @@ def retry(
                             fname=fname,
                             failure_callback=failure_callback,
                             elapsed_time=elapsed_time_before,
-                            timeout=timeout
+                            timeout=timeout,
                         )
 
                     result = f(*args, **kwargs)
@@ -54,7 +54,7 @@ def retry(
                             fname=fname,
                             failure_callback=failure_callback,
                             elapsed_time=elapsed_time_after,
-                            deadline=deadline
+                            deadline=deadline,
                         )
 
                     if retries > 0 and successful_retry_callback:
@@ -70,7 +70,7 @@ def retry(
                                 logger=logger,
                                 fname=fname,
                                 failure_callback=failure_callback,
-                                max_retries=max_retries
+                                max_retries=max_retries,
                             ) from original_exc
 
                     if retry_callback:
@@ -86,7 +86,7 @@ def retry(
                         deadline=deadline,
                         start_time=start_time,
                         delay=delay,
-                        exc_info=exc_info
+                        exc_info=exc_info,
                     )
                     sleep(delay)
                     retries += 1

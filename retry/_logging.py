@@ -1,5 +1,7 @@
+from typing import Union, Optional
 from time import time
 import logging
+
 
 RETRY_FUNCTION = "Will retry function {fname}."
 RETRY_REMAINING_RETRIES = "Remaining retries: {remaining_retries}."
@@ -13,14 +15,24 @@ def _init_logger():
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     console_handler.setFormatter(formatter)
     _retry_logger.addHandler(console_handler)
     return _retry_logger
 
 
-def _log_retry(logger, fname, max_retries, retries, timeout, deadline, start_time,  delay, exc_info):
+def _log_retry(
+    logger: logging.Logger,
+    fname: str,
+    max_retries: Union[int, None],
+    retries: int,
+    timeout: float,
+    deadline: float,
+    start_time: float,
+    delay: float,
+    exc_info: Optional[Exception]
+):
     if not logger:
         return
 
@@ -30,24 +42,14 @@ def _log_retry(logger, fname, max_retries, retries, timeout, deadline, start_tim
 
     if max_retries is not None:
         messages.append(
-            RETRY_REMAINING_RETRIES.format(
-                remaining_retries=max_retries-retries
-            )
+            RETRY_REMAINING_RETRIES.format(remaining_retries=max_retries - retries)
         )
     if timeout or deadline:
-        min_timeout = min(
-            [
-                t for t in (timeout, deadline) if t is not None
-            ]
-        )
+        min_timeout = min([t for t in (timeout, deadline) if t is not None])
         elapsed_time = time() - start_time
         messages.append(
-            RETRY_REMAINING_TIME.format(
-                remaining_time=min_timeout-elapsed_time
-            )
+            RETRY_REMAINING_TIME.format(remaining_time=min_timeout - elapsed_time)
         )
-    messages.append(
-        RETRY_DELAY.format(delay=delay)
-    )
+    messages.append(RETRY_DELAY.format(delay=delay))
 
     logger.warning(" ".join(messages), exc_info=exc_info)

@@ -1,16 +1,21 @@
+import logging
+from typing import Callable
+
+
 MAX_RETRIES_MESSAGE_TEMPLATE = (
     "Have reached max number of retries ({max_retries}) for function {fname}, aborting."
 )
-TIMEOUT_MESSAGE_TEMPLATE = (
-    "Have been retrying function {fname} for {elapsed_time} secs. Exceeded timeout of {timeout} secs, aborting."
-)
-DEADLINE_MESSAGE_TEMPLATE = (
-    "Have been retrying function {fname} for {elapsed_time} secs. Exceeded deadline of {deadline} secs, aborting."
-)
+TIMEOUT_MESSAGE_TEMPLATE = "Have been retrying function {fname} for {elapsed_time} secs. Exceeded timeout of {timeout} secs, aborting."
+DEADLINE_MESSAGE_TEMPLATE = "Have been retrying function {fname} for {elapsed_time} secs. Exceeded deadline of {deadline} secs, aborting."
 
 
 class BaseRetryException(Exception):
-    def __init__(self, logger, message, failure_callback):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        message: str,
+        failure_callback: Callable
+    ):
         if logger:
             logger.error(message)
         if failure_callback:
@@ -19,7 +24,13 @@ class BaseRetryException(Exception):
 
 
 class MaxRetriesException(BaseRetryException):
-    def __init__(self, logger, fname, failure_callback, max_retries):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        fname: str,
+        failure_callback: Callable,
+        max_retries: int,
+    ):
         message = MAX_RETRIES_MESSAGE_TEMPLATE.format(
             fname=fname, max_retries=max_retries
         )
@@ -27,7 +38,14 @@ class MaxRetriesException(BaseRetryException):
 
 
 class RetriesTimeoutException(BaseRetryException):
-    def __init__(self, logger, fname, failure_callback, elapsed_time: float, timeout: float):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        fname: str,
+        failure_callback: Callable,
+        elapsed_time: float,
+        timeout: float,
+    ):
         message = TIMEOUT_MESSAGE_TEMPLATE.format(
             fname=fname, elapsed_time=elapsed_time, timeout=timeout
         )
@@ -35,7 +53,14 @@ class RetriesTimeoutException(BaseRetryException):
 
 
 class RetriesDeadlineException(BaseRetryException):
-    def __init__(self, logger, fname, failure_callback, elapsed_time: float, deadline: float):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        fname: str,
+        failure_callback: Callable,
+        elapsed_time: float,
+        deadline: float
+    ):
         message = DEADLINE_MESSAGE_TEMPLATE.format(
             fname=fname, elapsed_time=elapsed_time, deadline=deadline
         )
