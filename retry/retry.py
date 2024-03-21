@@ -96,7 +96,7 @@ def retry(
     return wrapped_func
 
 
-@retry((AssertionError,), max_retries=3, timeout=2)
+@retry((AssertionError,), max_retries=3)
 def cause_trouble():
     assert False
 
