@@ -1,4 +1,4 @@
-from retry.backoff import (
+from retry.utils.backoff import (
     FixedBackOff,
     LinearBackOff,
     RandomUniformBackOff,

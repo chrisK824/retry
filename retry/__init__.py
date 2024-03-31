@@ -1,5 +1,6 @@
-from .callback import CallbackFactory, callback_factory
-from .backoff import (
+from .retry import retry
+from .utils.callback import CallbackFactory, callback_factory
+from .utils.backoff import (
     FixedBackOff,
     LinearBackOff,
     ExponentialBackOff,
@@ -7,6 +8,7 @@ from .backoff import (
 )
 
 __all__ = [
+    "retry",
     "CallbackFactory",
     "callback_factory",
     "FixedBackOff",

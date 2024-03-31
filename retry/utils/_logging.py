@@ -3,12 +3,6 @@ from time import time
 import logging
 
 
-RETRY_FUNCTION = "Will retry function {fname}."
-RETRY_REMAINING_RETRIES = "Remaining retries: {remaining_retries}."
-RETRY_REMAINING_TIME = "Remaining time: {remaining_time} secs."
-RETRY_DELAY = "Next retry in {delay} secs."
-
-
 def _init_logger():
     """
     Initialize logger for retry function.
@@ -59,22 +53,27 @@ def _log_retry(
     if not logger:
         return
 
+    base_message = "Will retry function {fname}."
+    remaining_retries_message = "Remaining retries: {remaining_retries}."
+    remaining_time_message = "Remaining time: {remaining_time} secs."
+    next_delay_message = "Next retry in {delay} secs."
+
     messages = []
 
-    messages.append(RETRY_FUNCTION.format(fname=fname))
+    messages.append(base_message.format(fname=fname))
 
     if max_retries is not None:
         messages.append(
-            RETRY_REMAINING_RETRIES.format(remaining_retries=max_retries - retries)
+            remaining_retries_message.format(remaining_retries=max_retries - retries)
         )
 
     if timeout or deadline:
         min_timeout = min([t for t in (timeout, deadline) if t is not None])
         elapsed_time = time() - start_time
         messages.append(
-            RETRY_REMAINING_TIME.format(remaining_time=min_timeout - elapsed_time)
+            remaining_time_message.format(remaining_time=min_timeout - elapsed_time)
         )
 
-    messages.append(RETRY_DELAY.format(delay=delay))
+    messages.append(next_delay_message.format(delay=delay))
 
     logger.warning(" ".join(messages), exc_info=exc_info)

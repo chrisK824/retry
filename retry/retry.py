@@ -1,31 +1,38 @@
 import logging
 from time import sleep
 from functools import wraps
-from typing import Union, Callable
+from typing import Union, Callable, Tuple, Type
 from time import time
-from _logging import _init_logger, _log_retry
-from _exceptions import (
+from .utils._validate import _validate_args
+from .utils._logging import _init_logger, _log_retry
+from .utils._exceptions import (
     MaxRetriesException,
     RetriesTimeoutException,
     RetriesDeadlineException,
 )
-from backoff import FixedBackOff
+from .utils.backoff import BackOff, FixedBackOff
 
 retry_logger = _init_logger()
 
 
 def retry(
-    exceptions: tuple = (Exception,),
+    exceptions: Tuple[Type[Exception]] = (Exception,),
     max_retries: Union[int, None] = None,
-    backoff=FixedBackOff(initial_delay=0),
+    backoff: BackOff = FixedBackOff(initial_delay=0),
     timeout: Union[float, None] = None,
     deadline: Union[float, None] = None,
-    logger: logging.Logger = retry_logger,
+    logger: Union[logging.Logger, None] = retry_logger,
     log_retry_traceback: bool = False,
-    failure_callback: Callable = None,
-    retry_callback: Callable = None,
-    successful_retry_callback: Callable = None,
+    failure_callback: Union[Callable, None] = None,
+    retry_callback: Union[Callable, None] = None,
+    successful_retry_callback: Union[Callable, None] = None
 ):
+    _validate_args(
+        exceptions, max_retries, backoff, timeout,
+        deadline, logger, log_retry_traceback,
+        failure_callback, retry_callback, successful_retry_callback
+    )
+
     def wrapped_func(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -94,11 +101,3 @@ def retry(
         return wrapper
 
     return wrapped_func
-
-
-@retry((AssertionError,), max_retries=3)
-def cause_trouble():
-    assert False
-
-
-cause_trouble()
