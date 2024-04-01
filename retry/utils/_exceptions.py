@@ -28,11 +28,11 @@ class BaseRetryException(Exception):
         message: str,
         failure_callback: Callable
     ):
+        super().__init__(message)
         if logger:
             logger.error(message)
         if failure_callback:
             failure_callback()
-        super().__init__(message)
 
 
 class MaxRetriesException(BaseRetryException):

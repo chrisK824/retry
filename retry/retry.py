@@ -61,7 +61,8 @@ def retry(
         @retry(exceptions=(ValueError,), max_retries=3, backoff=ExponentialBackOff(), timeout=10, logger=my_logger)
         def my_function():
             # Function body
-    """ 
+    """
+
     _validate_args(
         exceptions, max_retries, backoff, timeout,
         deadline, logger, log_retry_traceback,
@@ -77,34 +78,38 @@ def retry(
 
             while True:
                 try:
-                    elapsed_time_before = time() - start_time
-                    if timeout and elapsed_time_before > timeout:
-                        raise RetriesTimeoutException(
-                            logger=logger,
-                            fname=fname,
-                            failure_callback=failure_callback,
-                            elapsed_time=elapsed_time_before,
-                            timeout=timeout,
-                        )
+                    if timeout:
+                        elapsed_time_before = time() - start_time
+                        if elapsed_time_before > timeout:
+                            raise RetriesTimeoutException(
+                                logger=logger,
+                                fname=fname,
+                                failure_callback=failure_callback,
+                                elapsed_time=elapsed_time_before,
+                                timeout=timeout,
+                            )
 
                     result = f(*args, **kwargs)
 
-                    elapsed_time_after = time() - start_time
-                    if deadline and elapsed_time_after > deadline:
-                        raise RetriesDeadlineException(
-                            logger=logger,
-                            fname=fname,
-                            failure_callback=failure_callback,
-                            elapsed_time=elapsed_time_after,
-                            deadline=deadline,
-                        )
+                    if deadline:
+                        elapsed_time_after = time() - start_time
+                        logger.info(f"Elapsed time after: {elapsed_time_after}")
+                        if elapsed_time_after > deadline:
+                            raise RetriesDeadlineException(
+                                logger=logger,
+                                fname=fname,
+                                failure_callback=failure_callback,
+                                elapsed_time=elapsed_time_after,
+                                deadline=deadline,
+                            )
 
                     if retries > 0 and successful_retry_callback:
                         successful_retry_callback()
 
                     return result
                 except exceptions as original_exc:
-                    exc_info = original_exc if log_retry_traceback else None
+                    if isinstance(original_exc, (RetriesTimeoutException, RetriesDeadlineException)):
+                        raise original_exc
 
                     if max_retries is not None:
                         if retries == max_retries:
@@ -119,6 +124,7 @@ def retry(
                         retry_callback()
 
                     delay = backoff.delay
+                    exc_info = original_exc if log_retry_traceback else None
                     _log_retry(
                         logger=logger,
                         fname=fname,
