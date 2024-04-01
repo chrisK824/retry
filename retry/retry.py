@@ -12,13 +12,14 @@ from .utils._exceptions import (
 )
 from .utils.backoff import BackOff, FixedBackOff
 
+
 retry_logger = _init_logger()
 
 
 def retry(
     exceptions: Tuple[Type[Exception]] = (Exception,),
     max_retries: Union[int, None] = None,
-    backoff: BackOff = FixedBackOff(initial_delay=0),
+    backoff: BackOff = FixedBackOff(base_delay=0),
     timeout: Union[float, None] = None,
     deadline: Union[float, None] = None,
     logger: Union[logging.Logger, None] = retry_logger,
@@ -26,7 +27,41 @@ def retry(
     failure_callback: Union[Callable, None] = None,
     retry_callback: Union[Callable, None] = None,
     successful_retry_callback: Union[Callable, None] = None
-):
+) -> Callable:
+    """
+    Decorator that adds retry functionality to a function.
+
+    Parameters:
+        exceptions (Tuple[Type[Exception]], optional): A tuple of exception types that should trigger a retry.
+            Defaults to (Exception,), meaning any exception will trigger a retry.
+        max_retries (int, optional): The maximum number of retry attempts. Defaults to None (unlimited retries).
+        backoff (BackOff, optional): The backoff strategy to use between retry attempts.
+            Defaults to FixedBackOff(base_delay=0).
+        timeout (float, optional): The maximum time (in seconds) to spend on retries. Defaults to None (no timeout).
+            Timeout check happens right before retry execution of the wrapped function.
+        deadline (float, optional): The deadline (in seconds) for retries. Defaults to None (no deadline).
+            Deadline check happens right after the retry execution of the wrapped function.
+        logger (logging.Logger, optional): The logger instance to use for logging retry attempts. Defaults to retry_logger.
+        log_retry_traceback (bool, optional): Whether to log the traceback of exceptions triggering retries.
+            Defaults to False.
+        failure_callback (Callable, optional): A callback function to call in case of eventual failure after retries.
+            Defaults to None.
+        retry_callback (Callable, optional): A callback function to call between subsequent retry attempts.
+            Defaults to None.
+        successful_retry_callback (Callable, optional): A callback function to call after a successful retry.
+            Defaults to None.
+
+    Returns:
+        Callable: The decorated function.
+
+    Raises:
+        TypeError: If any argument has an invalid type.
+
+    Example:
+        @retry(exceptions=(ValueError,), max_retries=3, backoff=ExponentialBackOff(), timeout=10, logger=my_logger)
+        def my_function():
+            # Function body
+    """ 
     _validate_args(
         exceptions, max_retries, backoff, timeout,
         deadline, logger, log_retry_traceback,

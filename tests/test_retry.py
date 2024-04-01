@@ -48,7 +48,7 @@ def test_maximum_retries_reached():
 # def test_timeout():
 #     retries = 0
 
-#     @retry(timeout=2, backoff=FixedBackOff(initial_delay=1))
+#     @retry(timeout=2, backoff=FixedBackOff(base_delay=1))
 #     def timeout_function():
 #         nonlocal retries
 #         retries += 1
@@ -65,7 +65,7 @@ def test_maximum_retries_reached():
 #     start_time = None
 #     retries = []
 
-#     @retry(deadline=2, backoff=FixedBackOff(initial_delay=1))
+#     @retry(deadline=2, backoff=FixedBackOff(base_delay=1))
 #     def deadline_function():
 #         nonlocal start_time
 #         nonlocal retries

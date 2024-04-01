@@ -8,14 +8,15 @@ class BackOff(ABC):
     Base class for implementing backoff strategies.
     """
     def __init__(
-        self, initial_delay: float, jitter: Optional[Tuple[float, float]] = None
+        self, base_delay: float = 0, jitter: Optional[Tuple[float, float]] = None
     ):
         """
         Initialize BackOff object.
 
         Args:
-            initial_delay (float): Initial delay value, applies on
-            first round of delay.
+            base_delay (float): Initial delay value, applies on
+                first round of delay and calculations of next rounds.
+                Defaults to 0.
             jitter (Optional[Tuple[float, float]]): Tuple specifying
                 the range for jitter (random delay on top of
                 the calculated delay), applying after the first round.
@@ -26,10 +27,34 @@ class BackOff(ABC):
                 or if the values are not of type float.
             ValueError: If the `jitter` values are not in sorted order.
         """
-        self._base_delay = initial_delay
-        self._delay = initial_delay
+        self._base_delay = self._validate_base_delay(base_delay)
+        self._delay = base_delay
         self._jitter = self._validate_jitter(jitter)
         self._round = 0
+
+    def _validate_base_delay(self, base_delay: float) -> Optional[Tuple[float, float]]:
+        """
+        Validate the base delay of backoff strategy.
+
+        Args:
+            base_delay (float): Initial delay value, applies on
+                first round of delay and calculations of next rounds.
+
+        Returns:
+            float: The validated base delay of backoff strategy.
+
+        Raises:
+            TypeError: If the `base_delay` is not a positive float,
+                or if the values are not of type float.
+            ValueError: If the `jitter` values are not in sorted order.
+        """
+        if not isinstance(base_delay, (int, float)):
+            raise TypeError("Base delay must be a float.")
+
+        if base_delay < 0:
+            raise ValueError("Base delay must be a positive or zero float.")
+
+        return base_delay
 
     def _validate_jitter(self, jitter: Optional[Tuple[float, float]]) -> Optional[Tuple[float, float]]:
         """
@@ -58,10 +83,15 @@ class BackOff(ABC):
         if not (isinstance(min_val, (int, float)) and isinstance(max_val, (int, float))):
             raise TypeError("Jitter values must be of type float.")
 
+        if min_val < 0 or max_val < 0:
+            raise ValueError(
+                "Jitter values must be positive values."
+                )
+
         if min_val > max_val:
             raise ValueError(
-                "Jitter values must be in sorted order as they represent minimum and maximum values"
-                )
+                "Jitter values must be in sorted order as they represent minimum and maximum values."
+            )
 
         return min_val, max_val
 
@@ -105,7 +135,7 @@ class LinearBackOff(BackOff):
     """
     def __init__(
         self,
-        initial_delay: float,
+        base_delay: float,
         step: float,
         jitter: Optional[Tuple[float, float]] = None,
     ):
@@ -120,7 +150,7 @@ class LinearBackOff(BackOff):
                 the range for jitter (random delay on top of
                 the calculated delay), applying after the first round.
         """
-        super().__init__(initial_delay=initial_delay, jitter=jitter)
+        super().__init__(base_delay=base_delay, jitter=jitter)
         self.step = step
 
     def _calculate_next_delay(self):
@@ -137,7 +167,7 @@ class RandomUniformBackOff(BackOff):
     """
     Random uniform backoff strategy.
     """
-    def __init__(self, initial_delay: float, min_delay: float, max_delay: float):
+    def __init__(self, base_delay: float, min_delay: float, max_delay: float):
         """
         Initialize RandomUniformBackOff object.
 
@@ -150,7 +180,7 @@ class RandomUniformBackOff(BackOff):
                 the range for jitter (random delay on top of
                 the calculated delay), applying after the first round.
         """
-        super().__init__(initial_delay=initial_delay)
+        super().__init__(base_delay=base_delay)
         self.min_delay = min_delay
         self.max_delay = max_delay
 
