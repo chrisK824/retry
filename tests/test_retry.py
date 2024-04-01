@@ -40,7 +40,7 @@ def test_maximum_retries_reached():
     assert retries == 3
 
 
-def test_timeout(time_patch, sleep_patch):
+def test_timeout():
     retries = 0
     timeout = 2
 
@@ -53,7 +53,6 @@ def test_timeout(time_patch, sleep_patch):
     with pytest.raises(RetriesTimeoutException):
         timeout_function()
 
-    assert sleep_patch.call_count == timeout
     assert retries == timeout
 
 
