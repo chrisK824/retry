@@ -1,5 +1,5 @@
 # retry
-A simple yet powerful generic retry decorator in Python.
+A simple, yet powerful, generic retry decorator in Python for retrying functions with various backoff and callback strategies.
 
 
 ## Features:
