@@ -2,6 +2,9 @@
 A simple, yet powerful, generic retry decorator in Python for retrying functions with various backoff and callback strategies.
 
 
+## Install
+`pip install retry-reloaded`
+
 ## Features:
 
 - **Exception Handling**: Retry based on specific exceptions.
