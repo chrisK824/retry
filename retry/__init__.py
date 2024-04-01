@@ -6,9 +6,17 @@ from .utils.backoff import (
     ExponentialBackOff,
     RandomUniformBackOff,
 )
+from .utils._exceptions import (
+    MaxRetriesException,
+    RetriesTimeoutException,
+    RetriesDeadlineException
+)
 
 __all__ = [
     "retry",
+    "MaxRetriesException",
+    "RetriesTimeoutException",
+    "RetriesDeadlineException",
     "CallbackFactory",
     "callback_factory",
     "FixedBackOff",

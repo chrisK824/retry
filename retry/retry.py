@@ -13,7 +13,7 @@ from .utils._exceptions import (
 from .utils.backoff import BackOff, FixedBackOff
 
 
-retry_logger = _init_logger()
+retry_logger = _init_logger(__package__)
 
 
 def retry(
@@ -93,7 +93,6 @@ def retry(
 
                     if deadline:
                         elapsed_time_after = time() - start_time
-                        logger.info(f"Elapsed time after: {elapsed_time_after}")
                         if elapsed_time_after > deadline:
                             raise RetriesDeadlineException(
                                 logger=logger,
@@ -120,9 +119,6 @@ def retry(
                                 max_retries=max_retries,
                             ) from original_exc
 
-                    if retry_callback:
-                        retry_callback()
-
                     delay = backoff.delay
                     exc_info = original_exc if log_retry_traceback else None
                     _log_retry(
@@ -136,6 +132,10 @@ def retry(
                         delay=delay,
                         exc_info=exc_info,
                     )
+
+                    if retry_callback:
+                        retry_callback()
+
                     sleep(delay)
                     retries += 1
 

@@ -30,7 +30,7 @@ def retry_callback():
 
 
 @pytest.fixture
-def successfull_retry_callback():
+def successful_retry_callback():
     yield Mock()
 
 

@@ -3,14 +3,14 @@ from time import time
 import logging
 
 
-def _init_logger():
+def _init_logger(name):
     """
     Initialize logger for retry function.
 
     Returns:
         logging.Logger: Logger object configured for retry logging.
     """
-    _retry_logger = logging.getLogger(__name__)
+    _retry_logger = logging.getLogger(name)
     _retry_logger.setLevel(logging.DEBUG)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)

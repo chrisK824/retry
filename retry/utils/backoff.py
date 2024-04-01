@@ -151,7 +151,7 @@ class LinearBackOff(BackOff):
                 the calculated delay), applying after the first round.
         """
         super().__init__(base_delay=base_delay, jitter=jitter)
-        self.step = step
+        self.step = step if step else base_delay
 
     def _calculate_next_delay(self):
         """

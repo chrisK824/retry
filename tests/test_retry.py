@@ -87,20 +87,20 @@ def test_failure_callback_called(failure_callback):
     failure_callback.assert_called_once()
 
 
-def test_successfull_retry_callback_called(successfull_retry_callback):
+def test_successful_retry_callback_called(successful_retry_callback):
     retries = 0
     max_retries = 2
 
-    @retry(max_retries=max_retries, successful_retry_callback=successfull_retry_callback)
-    def successfull_retry_with_callback():
+    @retry(max_retries=max_retries, successful_retry_callback=successful_retry_callback)
+    def successful_retry_with_callback():
         nonlocal retries
         retries += 1
         if retries < max_retries:
             raise ValueError("Simulating failure")
 
-    successfull_retry_with_callback()
+    successful_retry_with_callback()
 
-    successfull_retry_callback.assert_called_once()
+    successful_retry_callback.assert_called_once()
 
 
 def test_retry_callback_called(retry_callback):
