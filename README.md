@@ -21,8 +21,23 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 - Backoff strategies: `FixedBackOff`, `LinearBackOff`, `ExponentialBackOff`, `RandomUniformBackOff`
 
 
-
 ## Examples
+
+```python
+# public API
+from retry import (
+    retry,
+    callback_factory,
+    CallbackFactory,
+    FixedBackOff,
+    LinearBackOff,
+    ExponentialBackOff,
+    RandomUniformBackOff,
+    MaxRetriesException,
+    RetriesTimeoutException,
+    RetriesDeadlineException
+)
+```
 
 ```python
 # Retry until maximum retries are reached
