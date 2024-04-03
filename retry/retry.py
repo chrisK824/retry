@@ -3,14 +3,14 @@ from time import sleep
 from functools import wraps
 from typing import Union, Callable, Tuple, Type
 from time import time
-from .utils._validate import _validate_args
-from .utils._logging import _init_logger, _log_retry
-from .utils._exceptions import (
+from ._validate import _validate_args
+from ._logging import _init_logger, _log_retry
+from ._exceptions import (
     MaxRetriesException,
     RetriesTimeoutException,
     RetriesDeadlineException,
 )
-from .utils.backoff import BackOff, FixedBackOff
+from .backoff import BackOff, FixedBackOff
 
 
 retry_logger = _init_logger(__package__)

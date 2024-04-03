@@ -1,4 +1,4 @@
-from retry.utils.callback import CallbackFactory, callback_factory
+from retry.callback import CallbackFactory, callback_factory
 import pytest
 
 

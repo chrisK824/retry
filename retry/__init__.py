@@ -1,12 +1,12 @@
 from .retry import retry
-from .utils.callback import CallbackFactory, callback_factory
-from .utils.backoff import (
+from .callback import CallbackFactory, callback_factory
+from .backoff import (
     FixedBackOff,
     LinearBackOff,
     ExponentialBackOff,
     RandomUniformBackOff,
 )
-from .utils._exceptions import (
+from ._exceptions import (
     MaxRetriesException,
     RetriesTimeoutException,
     RetriesDeadlineException
