@@ -1,4 +1,4 @@
-from retry import (
+from retry_reloaded import (
     retry,
     callback_factory,
     CallbackFactory,

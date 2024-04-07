@@ -1,12 +1,12 @@
 import pytest
 from time import sleep
-from retry.retry import retry
-from retry._exceptions import (
+from retry_reloaded import retry
+from retry_reloaded._exceptions import (
     MaxRetriesException,
     RetriesTimeoutException,
     RetriesDeadlineException
 )
-from retry.backoff import FixedBackOff
+from retry_reloaded.backoff import FixedBackOff
 
 
 def test_successful_execution():

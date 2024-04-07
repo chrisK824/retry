@@ -9,8 +9,8 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 
 - **Exception Handling**: Retry based on specific exceptions.
 - **Maximum Retries**: Set the maximum number of retry attempts.
-- **Timeout**: Specify the maximum time to spend on retries. Timeout check happens right before retry execution of the wrapped function.
-- **Deadline**: Define a deadline for retries to complete. Deadline check happens right after the retry execution of the wrapped function.
+- **Timeout**: Specify the maximum time in seconds to spend on retries. Timeout check happens right before retry execution of the wrapped function.
+- **Deadline**: Define a deadline in seconds for retries to complete. Deadline check happens right after the retry execution of the wrapped function.
 - **Backoff Strategies**: Choose from various backoff strategies: fixed, exponential, linear, random
 - **Retry Callback**: Execute a callback function between retry attempts.
 - **Successful Retry Callback**: Perform an action after a successful retry.
@@ -28,7 +28,7 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 
 ```python
 # public API
-from retry import (
+from retry_reloaded import (
     retry,
     callback_factory,
     CallbackFactory,

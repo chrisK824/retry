@@ -36,7 +36,7 @@ def retry(
             Defaults to (Exception,), meaning any exception will trigger a retry.
         max_retries (int, optional): The maximum number of retry attempts. Defaults to None (unlimited retries).
         backoff (BackOff, optional): The backoff strategy to use between retry attempts.
-            Defaults to FixedBackOff(base_delay=0).
+            Defaults to FixedBackOff(base_delay=0) with base_delay referring to seconds.
         timeout (float, optional): The maximum time (in seconds) to spend on retries. Defaults to None (no timeout).
             Timeout check happens right before retry execution of the wrapped function.
         deadline (float, optional): The deadline (in seconds) for retries. Defaults to None (no deadline).

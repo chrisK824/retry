@@ -1,4 +1,4 @@
-from retry.backoff import (
+from retry_reloaded.backoff import (
     FixedBackOff,
     LinearBackOff,
     RandomUniformBackOff,

@@ -1,5 +1,5 @@
 import pytest
-from retry.retry import retry
+from retry_reloaded import retry
 
 
 def test_valid_arguments():
