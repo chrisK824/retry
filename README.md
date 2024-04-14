@@ -7,7 +7,7 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 
 ## Features:
 
-- **Exception Handling**: Retry based on specific exceptions.
+- **Exception Handling**: Retry based on specific exceptions. If not specified then the default behaviour is to retry on all exceptions.
 - **Maximum Retries**: Set the maximum number of retry attempts.
 - **Timeout**: Specify the maximum time in seconds to spend on retries. Timeout check happens right before retry execution of the wrapped function.
 - **Deadline**: Define a deadline in seconds for retries to complete. Deadline check happens right after the retry execution of the wrapped function.
