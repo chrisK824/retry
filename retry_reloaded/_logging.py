@@ -19,6 +19,7 @@ def _init_logger(name):
     )
     console_handler.setFormatter(formatter)
     _retry_logger.addHandler(console_handler)
+    _retry_logger.propagate = False
     return _retry_logger
 
 
