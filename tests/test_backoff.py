@@ -77,16 +77,16 @@ def test_random_uniform_backoff(base_delay, min_delay, max_delay):
 
 
 @pytest.mark.parametrize(
-    "base_delay, jitter",
+    "base_delay, base, jitter",
     [
-        (1.0, None),
-        (1.0, (0.1, 0.5)),
-        (0.0, None),
-        (0.0, (0.0, 0.0)),
+        (1.0, None, None),
+        (1.0, None, (0.1, 0.5)),
+        (0.0, None, None),
+        (0.0, None, (0.0, 0.0)),
     ],
 )
-def test_exponential_backoff(base_delay, jitter):
-    backoff = ExponentialBackOff(base_delay, jitter)
+def test_exponential_backoff(base_delay, base, jitter):
+    backoff = ExponentialBackOff(base_delay, base, jitter)
 
     for _round in range(5):
         delay = backoff.delay
@@ -143,22 +143,22 @@ def test_linear_backoff_invalid_jitter():
 
 def test_exponential_backoff_invalid_jitter():
     with pytest.raises(ValueError):
-        ExponentialBackOff(1.0, (0.5, 0.1))
+        ExponentialBackOff(1.0, jitter=(0.5, 0.1))
 
     with pytest.raises(TypeError):
-        ExponentialBackOff(1.0, (0.5,))
+        ExponentialBackOff(1.0, jitter=(0.5,))
 
     with pytest.raises(TypeError):
-        ExponentialBackOff(1.0, (0.5, 0.1, 0.2))
+        ExponentialBackOff(1.0, jitter=(0.5, 0.1, 0.2))
 
     with pytest.raises(TypeError):
-        ExponentialBackOff(1.0, (0.5, 'a'))
+        ExponentialBackOff(1.0, jitter=(0.5, 'a'))
 
     with pytest.raises(TypeError):
-        ExponentialBackOff(1.0, ('a', 0.5))
+        ExponentialBackOff(1.0, jitter=('a', 0.5))
 
     with pytest.raises(TypeError):
-        ExponentialBackOff(1.0, ('a', 'b'))
+        ExponentialBackOff(1.0, jitter=('a', 'b'))
 
 
 def test_backoff_invalid_base_delay():
