@@ -28,7 +28,8 @@ def _validate_args(
         log_retry_traceback (bool): Flag to indicate if the traceback should be logged on each retry.
         failure_callback (Optional[Callable[[], None]]): Callback function to execute upon a failed retry, or None.
         retry_callback (Optional[Callable[[], None]]): Callback function to execute before each retry attempt, or None.
-        successful_retry_callback (Optional[Callable[[], None]]): Callback function to execute upon a successful retry, or None.
+        successful_retry_callback (Optional[Callable[[], None]]): Callback function to execute upon a successful retry,
+          or None.
 
     Raises:
         TypeError: If any of the arguments do not meet the expected types.
