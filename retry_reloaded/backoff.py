@@ -82,7 +82,7 @@ class BackOff(ABC):
 
         return float(min_val), float(max_val)
 
-    def _validate_step(self, step: float) -> float:
+    def _validate_step(self, step: Optional[float]) -> Optional[float]:
         """
         Validate the step delay value. If step is not specified then base delay of backoff
         strategy is used instead.
@@ -151,6 +151,12 @@ class BackOff(ABC):
         self._calculate_next_delay()
         return self._delay
 
+    def reset(self) -> None:
+        """
+        Reset the current delay.
+        """
+        self._round = 0
+
 
 class FixedBackOff(BackOff):
     """
@@ -170,7 +176,7 @@ class LinearBackOff(BackOff):
     """
     Linear backoff strategy.
     """
-    def __init__(self, base_delay: float, step: float, jitter: Optional[Tuple[float, float]] = None, 
+    def __init__(self, base_delay: float, step: float, jitter: Optional[Tuple[float, float]] = None,
                  max: Optional[float] = None):
         """
         Initialize LinearBackOff object.
@@ -230,7 +236,8 @@ class ExponentialBackOff(BackOff):
     """
     DEFAULT_BASE = 2
 
-    def __init__(self, base_delay: float, base: Optional[float] = None, jitter: Optional[Tuple[float, float]] = None, max: Optional[float] = None):
+    def __init__(self, base_delay: float, base: Optional[float] = None, jitter: Optional[Tuple[float, float]] = None,
+                 max: Optional[float] = None):
         """
         Initialize ExponentialBackOff object.
 

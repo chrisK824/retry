@@ -65,6 +65,10 @@ def test_linear_backoff(base_delay, step, jitter, max_delay):
             else:
                 assert delay <= max_delay
 
+    backoff.reset()
+    delay = backoff.delay
+    assert delay == base_delay
+
 
 @pytest.mark.parametrize(
     "base_delay, min_delay, max_delay",
@@ -120,6 +124,10 @@ def test_exponential_backoff(base_delay, base, jitter, max_delay):
                 assert delay <= expected_delay + high_jitter
             else:
                 assert delay <= max_delay
+
+    backoff.reset()
+    delay = backoff.delay
+    assert delay == base_delay
 
 
 def test_fixed_backoff_invalid_jitter():

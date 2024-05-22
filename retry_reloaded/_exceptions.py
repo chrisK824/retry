@@ -1,6 +1,5 @@
 import logging
-from typing import Callable
-
+from typing import Callable, Optional
 
 MAX_RETRIES_MESSAGE_TEMPLATE = (
     "Have reached max number of retries ({max_retries}) for function {fname}, aborting."
@@ -20,14 +19,15 @@ class BaseRetryException(Exception):
     Args:
         logger (logging.Logger): Logger object to use for logging the exception message.
         message (str): Message describing the exception.
-        failure_callback (Callable): Callback function to execute upon raising the exception.
+        failure_callback (Optional[Callable]): Callback function to execute upon raising the exception.
     """
+
     def __init__(
         self,
         logger: logging.Logger,
         message: str,
-        failure_callback: Callable
-    ):
+        failure_callback: Optional[Callable] = None
+    ) -> None:
         super().__init__(message)
         if logger:
             logger.error(message)
@@ -37,21 +37,22 @@ class BaseRetryException(Exception):
 
 class MaxRetriesException(BaseRetryException):
     """
-    Exception raised when maximum number of retries is reached.
+    Exception raised when the maximum number of retries is reached.
 
     Args:
         logger (logging.Logger): Logger object to use for logging the exception message.
         fname (str): Name of the function for which maximum retries were reached.
-        failure_callback (Callable): Callback function to execute upon raising the exception.
+        failure_callback (Optional[Callable]): Callback function to execute upon raising the exception.
         max_retries (int): Maximum number of retries that have been attempted.
     """
+
     def __init__(
         self,
         logger: logging.Logger,
         fname: str,
-        failure_callback: Callable,
         max_retries: int,
-    ):
+        failure_callback: Optional[Callable] = None
+    ) -> None:
         message = MAX_RETRIES_MESSAGE_TEMPLATE.format(
             fname=fname, max_retries=max_retries
         )
@@ -60,23 +61,24 @@ class MaxRetriesException(BaseRetryException):
 
 class RetriesTimeoutException(BaseRetryException):
     """
-    Exception raised when retry operation exceeds timeout.
+    Exception raised when retry operation exceeds the timeout.
 
     Args:
         logger (logging.Logger): Logger object to use for logging the exception message.
         fname (str): Name of the function for which retry operation exceeded timeout.
-        failure_callback (Callable): Callback function to execute upon raising the exception.
-        elapsed_time (float): Time elapsed during retry operation in seconds.
+        failure_callback (Optional[Callable]): Callback function to execute upon raising the exception.
+        elapsed_time (float): Time elapsed during the retry operation in seconds.
         timeout (float): Timeout value in seconds.
     """
+
     def __init__(
         self,
         logger: logging.Logger,
         fname: str,
-        failure_callback: Callable,
         elapsed_time: float,
         timeout: float,
-    ):
+        failure_callback: Optional[Callable] = None
+    ) -> None:
         message = TIMEOUT_MESSAGE_TEMPLATE.format(
             fname=fname, elapsed_time=elapsed_time, timeout=timeout
         )
@@ -85,23 +87,24 @@ class RetriesTimeoutException(BaseRetryException):
 
 class RetriesDeadlineException(BaseRetryException):
     """
-    Exception raised when retry operation exceeds deadline.
+    Exception raised when retry operation exceeds the deadline.
 
     Args:
         logger (logging.Logger): Logger object to use for logging the exception message.
         fname (str): Name of the function for which retry operation exceeded deadline.
-        failure_callback (Callable): Callback function to execute upon raising the exception.
-        elapsed_time (float): Time elapsed during retry operation in seconds.
+        failure_callback (Optional[Callable]): Callback function to execute upon raising the exception.
+        elapsed_time (float): Time elapsed during the retry operation in seconds.
         deadline (float): Deadline value in seconds.
     """
+
     def __init__(
         self,
         logger: logging.Logger,
         fname: str,
-        failure_callback: Callable,
         elapsed_time: float,
-        deadline: float
-    ):
+        deadline: float,
+        failure_callback: Optional[Callable] = None,
+    ) -> None:
         message = DEADLINE_MESSAGE_TEMPLATE.format(
             fname=fname, elapsed_time=elapsed_time, deadline=deadline
         )

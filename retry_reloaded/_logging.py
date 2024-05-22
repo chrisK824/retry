@@ -3,9 +3,12 @@ from time import time
 import logging
 
 
-def _init_logger(name):
+def _init_logger(name: str) -> logging.Logger:
     """
     Initialize logger for retry function.
+
+    Args:
+        name (str): Name for the logger.
 
     Returns:
         logging.Logger: Logger object configured for retry logging.
@@ -24,28 +27,28 @@ def _init_logger(name):
 
 
 def _log_retry(
-    logger: logging.Logger,
+    logger: Optional[logging.Logger],
     fname: str,
-    max_retries: Union[int, None],
+    max_retries: Optional[int],
     retries: int,
-    timeout: float,
-    deadline: float,
+    timeout: Optional[float],
+    deadline: Optional[float],
     start_time: float,
     delay: float,
-    exc_info: Optional[Exception]
-):
+    exc_info: Optional[Exception] = None
+) -> None:
     """
     Log retry information.
 
     Args:
-        logger (logging.Logger): Logger object to use for logging.
+        logger (Optional[logging.Logger]): Logger object to use for logging. If None, logging is skipped.
         fname (str): Name of the function being retried.
-        max_retries (Union[int, None]): Maximum number of retries allowed, or None if unlimited.
+        max_retries (Optional[int]): Maximum number of retries allowed, or None if unlimited.
         retries (int): Number of retries attempted so far.
-        timeout (float): Timeout value for the retry operation.
-        deadline (float): Deadline for the retry operation.
+        timeout (Optional[float]): Timeout value for the retry operation in seconds.
+        deadline (Optional[float]): Deadline for the retry operation in seconds.
         start_time (float): Start time of the retry operation.
-        delay (float): Delay until the next retry.
+        delay (float): Delay until the next retry in seconds.
         exc_info (Optional[Exception]): Information about the exception that triggered the retry.
 
     Returns:
@@ -59,9 +62,7 @@ def _log_retry(
     remaining_time_message = "Remaining time: {remaining_time} secs."
     next_delay_message = "Next retry in {delay} secs."
 
-    messages = []
-
-    messages.append(base_message.format(fname=fname))
+    messages = [base_message.format(fname=fname)]
 
     if max_retries is not None:
         messages.append(
