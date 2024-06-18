@@ -74,6 +74,7 @@ def retry(
         def wrapper(*args, **kwargs):
             start_time = time()
             retries = 0
+            backoff.reset()
             fname = f.__name__
 
             while True:
