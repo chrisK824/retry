@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from time import sleep
 from functools import wraps
 from typing import Union, Callable, Tuple, Type
@@ -74,7 +75,8 @@ def retry(
         def wrapper(*args, **kwargs):
             start_time = time()
             retries = 0
-            backoff.reset()
+            _backoff = deepcopy(backoff)
+            _backoff.reset()
             fname = f.__name__
 
             while True:
@@ -120,7 +122,7 @@ def retry(
                                 max_retries=max_retries,
                             ) from original_exc
 
-                    delay = backoff.delay
+                    delay = _backoff.delay
                     exc_info = original_exc if log_retry_traceback else None
                     _log_retry(
                         logger=logger,
