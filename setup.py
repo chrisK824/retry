@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="retry-reloaded",
-    version="0.0.7",
+    version="0.0.8",
     description="A simple Python library for retrying functions \
         with various backoff and callback strategies.",
     long_description=open("README.md").read(),
