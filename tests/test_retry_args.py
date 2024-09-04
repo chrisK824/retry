@@ -17,6 +17,13 @@ def test_invalid_exceptions():
             pass
 
 
+def test_invalid_excluded_exceptions():
+    with pytest.raises(TypeError):
+        @retry(excluded_exceptions=(ValueError, "not_an_exception_subclass"))
+        def invalid_exceptions_function():
+            pass
+
+
 def test_invalid_max_retries():
     with pytest.raises(TypeError):
         @retry(max_retries="not_an_integer")

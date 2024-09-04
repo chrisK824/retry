@@ -145,3 +145,35 @@ def test_reraise_exception_false():
         function_that_fails()
 
     assert retries == max_retries + 1
+
+
+def test_no_retry_on_excluded_exception():
+    retries = 0
+
+    @retry(excluded_exceptions=(ValueError,), max_retries=2)
+    def raise_value_error():
+        nonlocal retries
+        retries += 1
+        raise ValueError("Simulating ValueError")
+
+    with pytest.raises(ValueError):
+        raise_value_error()
+
+    assert retries == 1
+
+
+def test_retry_on_mixed_exclusions():
+    retries = 0
+
+    @retry(exceptions=(ValueError, TypeError), excluded_exceptions=(ValueError,), max_retries=5)
+    def raise_mixed_exceptions():
+        nonlocal retries
+        retries += 1
+        if retries == 5:
+            raise ValueError("Simulating excluded ValueError")
+        raise TypeError("Simulating TypeError")
+
+    with pytest.raises(ValueError, match="Simulating excluded ValueError"):
+        raise_mixed_exceptions()
+
+    assert retries == 5

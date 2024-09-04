@@ -5,6 +5,7 @@ from .backoff import BackOff
 
 def _validate_args(
     exceptions: Tuple[Type[Exception], ...],
+    excluded_exceptions: Tuple[Type[Exception], ...],
     max_retries: Optional[int],
     backoff: BackOff,
     timeout: Optional[float],
@@ -21,6 +22,7 @@ def _validate_args(
 
     Args:
         exceptions (Tuple[Type[Exception], ...]): Tuple of exception types to catch.
+        excluded_exceptions (Tuple[Type[Exception]], ...): Tuple of exception types not to catch.
         max_retries (Optional[int]): Maximum number of retries allowed, or None for unlimited retries.
         backoff (BackOff): BackOff instance to manage retry delays.
         timeout (Optional[float]): Timeout value for the retry operation in seconds, or None if no timeout.
@@ -31,6 +33,7 @@ def _validate_args(
         retry_callback (Optional[Callable[[], None]]): Callback function to execute before each retry attempt, or None.
         successful_retry_callback (Optional[Callable[[], None]]): Callback function to execute upon a successful retry,
           or None.
+        reraise_exception (bool): Whether to re-raise the last exception caught in case of failure after retries.
 
     Raises:
         TypeError: If any of the arguments do not meet the expected types.
@@ -41,6 +44,10 @@ def _validate_args(
     for exc in exceptions:
         if not issubclass(exc, Exception):
             raise TypeError("All items in the exceptions tuple must be subclasses of Exception")
+
+    for exc in excluded_exceptions:
+        if not issubclass(exc, Exception):
+            raise TypeError("All items in the excluded_exceptions tuple must be subclasses of Exception")
 
     if max_retries is not None and not isinstance(max_retries, int):
         raise TypeError("max_retries must be an integer or None")

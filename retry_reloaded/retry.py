@@ -19,6 +19,7 @@ retry_logger = _init_logger(__package__)
 
 def retry(
     exceptions: Tuple[Type[Exception]] = (Exception,),
+    excluded_exceptions: Tuple[Type[Exception]] = (),
     max_retries: Union[int, None] = None,
     backoff: BackOff = FixedBackOff(base_delay=0),
     timeout: Union[float, None] = None,
@@ -36,6 +37,8 @@ def retry(
     Parameters:
         exceptions (Tuple[Type[Exception]], optional): A tuple of exception types that should trigger a retry.
             Defaults to (Exception,), meaning any exception will trigger a retry.
+        excluded_exceptions (Tuple[Type[Exception]], optional): A tuple of exception types that should not trigger
+            a retry. Defaults to an empty tuple.
         max_retries (int, optional): The maximum number of retry attempts. Defaults to None (unlimited retries).
         backoff (BackOff, optional): The backoff strategy to use between retry attempts.
             Defaults to FixedBackOff(base_delay=0) with base_delay referring to seconds.
@@ -68,11 +71,15 @@ def retry(
     """
 
     _validate_args(
-        exceptions, max_retries, backoff, timeout,
-        deadline, logger, log_retry_traceback,
-        failure_callback, retry_callback, successful_retry_callback,
-        reraise_exception
+        exceptions, excluded_exceptions, max_retries, backoff,
+        timeout, deadline, logger, log_retry_traceback, failure_callback,
+        retry_callback, successful_retry_callback, reraise_exception
     )
+
+    target_exceptions = tuple(set(exceptions) - set(excluded_exceptions))
+
+    if not target_exceptions:
+        target_exceptions = (Exception,)
 
     def wrapped_func(f):
         @wraps(f)
@@ -114,10 +121,13 @@ def retry(
                         successful_retry_callback()
 
                     return result
-                except exceptions as original_exc:
+                except target_exceptions as original_exc:
                     if isinstance(original_exc, (RetriesTimeoutException, RetriesDeadlineException)):
                         if reraise_exception and last_exception is not None:
                             raise last_exception
+                        raise original_exc
+
+                    if isinstance(original_exc, excluded_exceptions):
                         raise original_exc
 
                     last_exception = original_exc

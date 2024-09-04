@@ -12,6 +12,8 @@ from retry_reloaded import (
 )
 from time import sleep
 import logging
+from random import randint
+
 
 # get the package logger if you don't intend to use your own
 logger = logging.getLogger("retry_reloaded")
@@ -132,6 +134,16 @@ def retry_with_reraise():
     raise ValueError("Original exception to be re-raised")
 
 
+@retry(excluded_exceptions=(ValueError,))
+def give_up_on_value_error():
+    random_int = randint(1, 10)
+
+    if random_int >= 5:
+        raise RuntimeError
+    else:
+        raise ValueError("Give up on the error, do not retry.")
+
+
 if __name__ == "__main__":
 
     # propagate the exception raised here just
@@ -172,3 +184,8 @@ if __name__ == "__main__":
         retry_with_reraise()
     except ValueError as e:
         logger.error(f"Caught re-raised exception: {e}")
+
+    try:
+        give_up_on_value_error()
+    except ValueError as e:
+        logger.error(f"Caught not retried exception: {e}")

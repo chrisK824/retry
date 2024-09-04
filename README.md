@@ -8,6 +8,7 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 ## Features:
 
 - **Exception Handling**: Retry based on specific exceptions. If not specified then the default behaviour is to retry on all exceptions.
+- **Excluded Exceptions**: Specify exceptions that should not trigger retries. If an exception listed in excluded_exceptions is raised, the retry mechanism will not retry and will raise the exception immediately. Useful use case for this is to target the generic (and default) Exception in `exceptions` parameter and opt-out from retrying on specific exceptions.
 - **Maximum Retries**: Set the maximum number of retry attempts.
 - **Timeout**: Specify the maximum time in seconds to spend on retries. Timeout check happens right before retry execution of the wrapped function.
 - **Deadline**: Define a deadline in seconds for retries to complete. Deadline check happens right after the retry execution of the wrapped function.
@@ -162,9 +163,17 @@ def fail_with_callback():
 )
 def retry_with_reraise():
     raise ValueError("Original exception to be re-raised")
+```
 
-try:
-    retry_with_reraise()
-except ValueError as e:
-    logger.error(f"Caught re-raised exception: {e}")
+```python
+# Retry on all exceptions, except from ValueError
+@retry(excluded_exceptions=(ValueError,))
+def give_up_on_value_error():
+    random_int = randint(1, 10)
+
+    if random_int >= 5:
+        raise RuntimeError
+    else:
+        raise ValueError("Give up on the error, do not retry.")
+
 ```
