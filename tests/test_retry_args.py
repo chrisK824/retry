@@ -78,3 +78,10 @@ def test_invalid_successful_retry_callback():
         @retry(successful_retry_callback="not_a_callable")
         def invalid_successful_retry_callback_function():
             pass
+
+
+def test_invalid_reraise_exception():
+    with pytest.raises(TypeError):
+        @retry(reraise_exception="not_a_boolean")
+        def invalid_reraise_exception_function():
+            pass

@@ -27,7 +27,8 @@ def retry(
     log_retry_traceback: bool = False,
     failure_callback: Union[Callable, None] = None,
     retry_callback: Union[Callable, None] = None,
-    successful_retry_callback: Union[Callable, None] = None
+    successful_retry_callback: Union[Callable, None] = None,
+    reraise_exception: bool = False
 ) -> Callable:
     """
     Decorator that adds retry functionality to a function.
@@ -51,6 +52,8 @@ def retry(
             Defaults to None.
         successful_retry_callback (Callable, optional): A callback function to call after a successful retry.
             Defaults to None.
+        reraise_exception (bool, optional): Whether to re-raise the last exception caught in case of failure after retries.
+            Defaults to False.
 
     Returns:
         Callable: The decorated function.
@@ -67,7 +70,8 @@ def retry(
     _validate_args(
         exceptions, max_retries, backoff, timeout,
         deadline, logger, log_retry_traceback,
-        failure_callback, retry_callback, successful_retry_callback
+        failure_callback, retry_callback, successful_retry_callback,
+        reraise_exception
     )
 
     def wrapped_func(f):
@@ -78,6 +82,7 @@ def retry(
             _backoff = deepcopy(backoff)
             _backoff.reset()
             fname = f.__name__
+            last_exception = None
 
             while True:
                 try:
@@ -111,10 +116,16 @@ def retry(
                     return result
                 except exceptions as original_exc:
                     if isinstance(original_exc, (RetriesTimeoutException, RetriesDeadlineException)):
+                        if reraise_exception and last_exception is not None:
+                            raise last_exception
                         raise original_exc
+
+                    last_exception = original_exc
 
                     if max_retries is not None:
                         if retries == max_retries:
+                            if reraise_exception and last_exception is not None:
+                                raise last_exception
                             raise MaxRetriesException(
                                 logger=logger,
                                 fname=fname,

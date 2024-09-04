@@ -16,6 +16,7 @@ A simple, yet powerful, generic retry decorator in Python for retrying functions
 - **Successful Retry Callback**: Perform an action after a successful retry.
 - **Failure Callback**: Define a callback function after failing all retries.
 - **Logging control**: Define which logger (or no logger) to use for logging retries and exceptions.
+- **Exception Re-raising**: Optionally re-raise the last original exception that occured after all retries have been exhausted.
 
 ## API
 - Decorator: `retry`
@@ -148,4 +149,22 @@ failure_callback_ = CallbackFactory(failure_callback, value="wasted")
 )
 def fail_with_callback():
     raise ValueError
+```
+
+
+```python
+# Retry with re-raising the original exception after all retries
+# Retry 2 times and then raise the original exception (ValueError)
+@retry(
+        (ValueError,),
+        max_retries=2,
+        reraise_exception=True
+)
+def retry_with_reraise():
+    raise ValueError("Original exception to be re-raised")
+
+try:
+    retry_with_reraise()
+except ValueError as e:
+    logger.error(f"Caught re-raised exception: {e}")
 ```

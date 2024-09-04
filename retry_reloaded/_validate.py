@@ -13,7 +13,8 @@ def _validate_args(
     log_retry_traceback: bool,
     failure_callback: Optional[Callable[[], None]],
     retry_callback: Optional[Callable[[], None]],
-    successful_retry_callback: Optional[Callable[[], None]]
+    successful_retry_callback: Optional[Callable[[], None]],
+    reraise_exception: bool
 ) -> None:
     """
     Validate arguments for retry logic.
@@ -67,3 +68,6 @@ def _validate_args(
 
     if successful_retry_callback is not None and not callable(successful_retry_callback):
         raise TypeError("successful_retry_callback must be a callable or None")
+
+    if not isinstance(reraise_exception, bool):
+        raise TypeError("reraise_exception must be a boolean")

@@ -113,3 +113,35 @@ def test_retry_callback_called(retry_callback):
         retry_with_callback()
 
     retry_callback.call_count = max_retries
+
+
+def test_reraise_exception_true():
+    retries = 0
+    max_retries = 2
+
+    @retry(max_retries=max_retries, reraise_exception=True)
+    def function_that_fails():
+        nonlocal retries
+        retries += 1
+        raise ValueError("Simulating failure")
+
+    with pytest.raises(ValueError, match="Simulating failure"):
+        function_that_fails()
+
+    assert retries == max_retries + 1
+
+
+def test_reraise_exception_false():
+    retries = 0
+    max_retries = 2
+
+    @retry(max_retries=max_retries, reraise_exception=False)
+    def function_that_fails():
+        nonlocal retries
+        retries += 1
+        raise ValueError("Simulating failure")
+
+    with pytest.raises(MaxRetriesException):
+        function_that_fails()
+
+    assert retries == max_retries + 1

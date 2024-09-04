@@ -14,7 +14,7 @@ from time import sleep
 import logging
 
 # get the package logger if you don't intend to use your own
-logger = logging.getLogger("retry")
+logger = logging.getLogger("retry_reloaded")
 
 
 # Retry until maximum retries are reached
@@ -121,6 +121,17 @@ def fail_with_callback():
     raise ValueError
 
 
+# Retry with re-raising the original exception after all retries
+# Retry 2 times and then raise the original exception (ValueError)
+@retry(
+        (ValueError,),
+        max_retries=2,
+        reraise_exception=True
+)
+def retry_with_reraise():
+    raise ValueError("Original exception to be re-raised")
+
+
 if __name__ == "__main__":
 
     # propagate the exception raised here just
@@ -156,3 +167,8 @@ if __name__ == "__main__":
         fail_with_callback()
     except MaxRetriesException:
         pass
+
+    try:
+        retry_with_reraise()
+    except ValueError as e:
+        logger.error(f"Caught re-raised exception: {e}")
